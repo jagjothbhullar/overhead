@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: overhead
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    branch: main
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
