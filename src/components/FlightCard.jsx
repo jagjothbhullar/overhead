@@ -15,7 +15,18 @@ export default function FlightCard({ flight, userLocation, onClose }) {
       <div className="flight-card-header">
         <span className="flight-card-icon">{typeIcon}</span>
         <div>
-          <div className="flight-card-callsign">{flight.callsign || 'NO CALLSIGN'}</div>
+          {flight.callsign ? (
+            <a
+              className="flight-card-callsign"
+              href={`https://www.flightaware.com/live/flight/${flight.callsign}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {flight.callsign}
+            </a>
+          ) : (
+            <div className="flight-card-callsign">NO CALLSIGN</div>
+          )}
           <div className="flight-card-airline">{airline.name}</div>
         </div>
       </div>
