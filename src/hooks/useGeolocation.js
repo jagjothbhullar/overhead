@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function useGeolocation() {
   const [location, setLocation] = useState(null);
@@ -18,12 +18,22 @@ export default function useGeolocation() {
         setLoading(false);
       },
       (err) => {
-        setError(err.message);
+        const messages = {
+          1: 'Location permission denied',
+          2: 'Location unavailable',
+          3: 'Location request timed out',
+        };
+        setError(messages[err.code] || err.message || 'Could not get location');
         setLoading(false);
       },
       { enableHighAccuracy: false, timeout: 10000 }
     );
   }, []);
 
-  return { location, error, loading };
+  const setManualLocation = useCallback((lat, lng) => {
+    setLocation({ lat, lng });
+    setError(null);
+  }, []);
+
+  return { location, error, loading, setManualLocation };
 }

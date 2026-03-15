@@ -11,15 +11,40 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 
 export default function App() {
-  const { location, error: geoError, loading: geoLoading } = useGeolocation();
+  const { location, error: geoError, loading: geoLoading, setManualLocation } = useGeolocation();
   const { flights, loading: flightsLoading, error: flightsError, lastUpdated } = useFlights(location);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { alert, dismissAlert } = useOverheadAlert(flights, location);
+  const [zipcode, setZipcode] = useState('');
+  const [zipError, setZipError] = useState(null);
+  const [zipLoading, setZipLoading] = useState(false);
 
   const activeFlight = selectedFlight
     ? flights.find((f) => f.icao24 === selectedFlight.icao24) || selectedFlight
     : null;
+
+  const handleZipSubmit = async (e) => {
+    e.preventDefault();
+    const zip = zipcode.trim();
+    if (!/^\d{5}$/.test(zip)) {
+      setZipError('Enter a valid 5-digit zip code');
+      return;
+    }
+    setZipLoading(true);
+    setZipError(null);
+    try {
+      const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
+      if (!res.ok) throw new Error('Zip code not found');
+      const data = await res.json();
+      const place = data.places[0];
+      setManualLocation(parseFloat(place.latitude), parseFloat(place.longitude));
+    } catch {
+      setZipError('Could not find that zip code. Try another.');
+    } finally {
+      setZipLoading(false);
+    }
+  };
 
   if (geoLoading) {
     return (
@@ -36,7 +61,23 @@ export default function App() {
         <div className="loading-icon error">✕</div>
         <div className="loading-text">Location access needed</div>
         <div className="loading-sub">{geoError}</div>
-        <div className="loading-sub">Enable location permissions and reload.</div>
+        <div className="loading-sub">Enable location permissions and reload, or enter your zip code below.</div>
+        <form className="zip-form" onSubmit={handleZipSubmit}>
+          <input
+            className="zip-input"
+            type="text"
+            inputMode="numeric"
+            maxLength={5}
+            placeholder="Zip code"
+            value={zipcode}
+            onChange={(e) => setZipcode(e.target.value)}
+            autoFocus
+          />
+          <button className="zip-btn" type="submit" disabled={zipLoading}>
+            {zipLoading ? '...' : 'Go'}
+          </button>
+        </form>
+        {zipError && <div className="loading-sub" style={{ color: '#ff6b6b' }}>{zipError}</div>}
       </div>
     );
   }
