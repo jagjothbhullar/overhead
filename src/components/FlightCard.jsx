@@ -17,12 +17,13 @@ export default function FlightCard({ flight, userLocation, onClose }) {
         <div>
           {flight.callsign ? (
             <a
-              className="flight-card-callsign"
+              className="flight-card-callsign flight-card-link"
               href={`https://www.flightaware.com/live/flight/${flight.callsign}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
             >
-              {flight.callsign}
+              {flight.callsign} <span className="link-arrow">↗</span>
             </a>
           ) : (
             <div className="flight-card-callsign">NO CALLSIGN</div>

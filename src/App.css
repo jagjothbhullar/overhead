@@ -395,14 +395,23 @@ html, body, #root {
   text-decoration: none;
 }
 
-a.flight-card-callsign {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: #00d4ff60;
+a.flight-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 212, 255, 0.2);
 }
 
-a.flight-card-callsign:hover {
-  text-decoration-color: #00d4ff;
+a.flight-card-link:hover,
+a.flight-card-link:active {
+  color: #fff;
+}
+
+.link-arrow {
+  font-size: 14px;
+  opacity: 0.5;
 }
 
 .flight-card-airline {
